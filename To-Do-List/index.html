@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do-LIst</title>
+    <link rel="stylesheet" href="style.css">
+     <link rel="shortcut icon" href="./assets/6194029.png" type="image/x-icon">
+</head>
+
+<body>
+    <div class="container">
+        <div class="todo-app">
+            <h2>To-Do-List <img src="./assets/icon.png" alt=""></h2>
+            <div class="row">
+                <input type="text" id="input-box" placeholder="Add Your Text">
+                <button onclick="AddTask()">Add</button>
+            </div>
+            <ul id="list-container">
+                <!-- <li class="checked">task1</li> -->
+                <!-- <li>task2</li>
+                <li>task3</li>  -->
+            </ul>
+        </div>
+    </div>
+    <script>
+
+
+        const inputbox = document.getElementById("input-box");
+        const listcontainer = document.getElementById("list-container");
+
+        function AddTask() {
+            const taskText = inputbox.value.trim();
+
+            if (taskText === "") {
+                alert("You must write something!");
+                return;
+            }
+
+            // Check for duplicates
+            const existingTasks = Array.from(listcontainer.getElementsByTagName("li")).map(li => li.textContent.slice(0, -1).trim());
+            if (existingTasks.includes(taskText)) {
+                alert("This task already exists!");
+                return;
+            }
+
+            let li = document.createElement("li");
+            li.textContent = taskText;
+
+
+            let span = document.createElement("span");
+            span.innerHTML = "\u00d7";
+            li.appendChild(span);
+
+            listcontainer.appendChild(li);
+            inputbox.value = "";
+            savedata();
+        }
+
+        listcontainer.addEventListener("click", function (e) {
+            if (e.target.tagName === "LI") {
+                e.target.classList.toggle("checked");
+                savedata();
+            } else if (e.target.tagName === "SPAN") {
+                e.target.parentElement.remove();
+                savedata();
+            }
+        });
+
+
+        function savedata() {
+            const tasks = Array.from(listcontainer.getElementsByTagName("li")).map(li => ({
+                text: li.childNodes[0].textContent,
+                checked: li.classList.contains("checked")
+            }));
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+
+        function showtask() {
+            const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            storedTasks.forEach(task => {
+                let li = document.createElement("li");
+                li.textContent = task.text;
+
+                if (task.checked) {
+                    li.classList.add("checked");
+                }
+
+                let span = document.createElement("span");
+                span.innerHTML = "\u00d7";
+                li.appendChild(span);
+
+                listcontainer.appendChild(li);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", showtask);
+    </script>
+</body>
+
+</html>
